@@ -1,0 +1,51 @@
+version: "3"
+services:
+
+  #Backend Service
+  cvgenerator-be:
+    build:
+      context: .
+      dockerfile: dockerfile
+    image: unosquare/cvgenerator-be:latest
+    restart: always
+    environment:
+      - SERVER_PORT=8080
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/postgres?user=postgres&password=password
+    ports:
+      - 8080:8080
+    depends_on:
+      - flyway
+  flyway:
+    image: flyway/flyway
+    command: -url=jdbc:postgresql://db/postgres -schemas=public -user=postgres -password=password -connectRetries=5 migrate
+    volumes:
+      - ./db-migrations:/flyway/sql
+    depends_on:
+      - db
+  db:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+    volumes:
+      - postgres:/var/lib/postgresql/data
+  
+  # Frontend Service 
+  web:
+    build: .
+    image: cvgenerator-fe
+
+    ports:
+      - "80:80"
+volumes:
+  postgres:
+
+## TODO
+## update BE context path
+## update FE build path
+## update flyway volumes path
+## ports?
