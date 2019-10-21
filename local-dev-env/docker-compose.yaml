@@ -1,10 +1,10 @@
 version: "3"
 services:
 
-  #Backend Service
+  # Backend Service
   cvgenerator-be:
     build:
-      context: .
+      context: ../../CVGenerator-backend
       dockerfile: dockerfile
     image: unosquare/cvgenerator-be:latest
     restart: always
@@ -19,7 +19,7 @@ services:
     image: flyway/flyway
     command: -url=jdbc:postgresql://db/postgres -schemas=public -user=postgres -password=password -connectRetries=5 migrate
     volumes:
-      - ./db-migrations:/flyway/sql
+      - ../../CVGenerator-backend/db-migrations:/flyway/sql
     depends_on:
       - db
   db:
@@ -36,16 +36,10 @@ services:
   
   # Frontend Service 
   web:
-    build: .
+    build: ../../CVGenerator-frontend
     image: cvgenerator-fe
 
     ports:
-      - "80:80"
+      - 80:80
 volumes:
   postgres:
-
-## TODO
-## update BE context path
-## update FE build path
-## update flyway volumes path
-## ports?
